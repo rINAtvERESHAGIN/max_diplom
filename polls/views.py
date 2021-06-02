@@ -8,15 +8,19 @@ from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 
 from polls.models import Posts
+from polls.models import Music
 
 
 @csrf_exempt
-def add_post(request):
-    comment = request.POST.get("comment").split(",")
-    tags = request.POST.get("tags").split(",")
-    user_details = {"first_name": request.POST.get("first_name"), "last_name": request.POST.get("last_name")}
-    post = Posts(post_title=request.POST.get("post_title"), post_description=request.POST.get("post_description"),
-                 comment=comment, tags=tags, user_details=user_details)
+def add_music(request):
+    post = Posts(composer=request.POST.get("composer"),
+                 executor=request.POST.get("executor"),
+                 genre=request.POST.get("genre"),
+                 label=request.POST.get("label"),
+                 nominations=request.POST.get("nominations"),
+                 release_date=request.POST.get("release_date"),
+                 songwriter=request.POST.get("songwriter"),
+                 file_in_binary=request.POST.get("file_in_binary"))
     post.save()
     return HttpResponse("inserted")
 
@@ -44,10 +48,11 @@ def read_post(request, id):
     return HttpResponse(stringval)
 
 
-def read_post_all(request):
-    posts = Posts.object.all()
+def get_all_music(request):
+    posts = Music.object.all()
     stringval = ""
-    for post in posts :
-        stringval += "First Name : " + post.user_details['first_name'] + " Last Name : " + post.user_details['last_name'] \
-                    + " Post Title " + post.post_title + " Comment " + post.comment[0] + "<br>"
+    for post in posts:
+        stringval += "composer" + post.composer + "executor " + post.executor + "genre " + post.genre + "label " + \
+                     post.label + "nominations " + post.nominations + "release_date " + post.genre + "songwriter " + \
+                     post.label + "file_in_binary" + post.file_in_binary + "<br>"
     return HttpResponse(stringval)

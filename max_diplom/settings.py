@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-8c5k4-jja787#i0r-01_f&j5wk#oq-#4ulzu!xkv_-tu*9=7h%
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["192.168.1.6", "192.168.1.4"]
+ALLOWED_HOSTS = ["192.168.1.6", "192.168.1.4","'127.0.0.1"]
 
 
 # Application definition
@@ -83,7 +83,7 @@ DATABASES = {
 
     'default': {
         'ENGINE': 'djongo',
-        'NAME': 'testbd',
+        'NAME': 'Music',
     }
 }
 

@@ -23,3 +23,16 @@ class Posts(models.Model):
     tags = models.JSONField()
     user_details = models.JSONField()
     object = models.DjongoManager()
+
+
+class Music(models.Model):
+    _id = models.ObjectIdField()
+    composer = models.TextField()
+    executor = models.TextField()
+    genre = models.TextField()
+    label = models.TextField()
+    nominations = models.TextField()
+    release_date = models.TextField()
+    songwriter = models.TextField()
+    file_in_binary = models.TextField()
+    object = models.DjongoManager()
