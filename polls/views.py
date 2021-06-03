@@ -1,9 +1,13 @@
 from unittest.case import _id
-
+from django.http.response import HttpResponse, JsonResponse, HttpResponseBadRequest
 from bson import ObjectId
 from django.http import HttpResponse
 from django.shortcuts import render
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
 
+from polls.serializers import AddNewMusicSerializer
 # Create your views here.
 from django.views.decorators.csrf import csrf_exempt
 
@@ -11,17 +15,64 @@ from polls.models import Posts
 from polls.models import Music
 
 
+class AddNewMusic(APIView):
+    def post(self, request):
+        def get_response_music():
+            musics = Music.object.all()
+            response_data = []
+
+            for music in musics:
+                response_data.append({
+                    "composer": music.composer,
+                    "executor": music.executor,
+                    "genre": music.genre,
+                    "label": music.label,
+                    "nominations": music.nominations,
+                    "release_date": music.release_date,
+                    "songwriter": music.songwriter,
+                })
+            return response_data
+
+        print(request.data)
+        serializer = AddNewMusicSerializer(data=request.data)
+
+        print('serializer.is_valid()', serializer.is_valid())
+
+        print('SSSSS', serializer.data.pop('composer'))
+        print('SSSSS', serializer.data.keys())
+        if serializer.is_valid():
+            music = Music(
+                composer=serializer.data.pop("composer"),
+                executor=serializer.data.pop("executor"),
+                genre=serializer.data.pop("genre"),
+                label=serializer.data.pop("label"),
+                nominations=serializer.data.pop("nominations"),
+                release_date=serializer.data.pop("release_date"),
+                songwriter=serializer.data.pop("songwriter"),
+                file_in_binary=serializer.data.pop("file_in_binary"),
+            )
+            music.save()
+            return JsonResponse(data=get_response_music(), safe=False)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
 @csrf_exempt
 def add_music(request):
-    post = Posts(composer=request.POST.get("composer"),
-                 executor=request.POST.get("executor"),
-                 genre=request.POST.get("genre"),
-                 label=request.POST.get("label"),
-                 nominations=request.POST.get("nominations"),
-                 release_date=request.POST.get("release_date"),
-                 songwriter=request.POST.get("songwriter"),
-                 file_in_binary=request.POST.get("file_in_binary"))
-    post.save()
+    print(request.POST)
+    print(request.POST.get("composer"))
+    print(request.data)
+
+    music = Music(
+        composer=request.POST.get("composer"),
+        executor=request.POST.get("executor"),
+        genre=request.POST.get("genre"),
+        label=request.POST.get("label"),
+        nominations=request.POST.get("nominations"),
+        release_date=request.POST.get("release_date"),
+        songwriter=request.POST.get("songwriter"),
+        file_in_binary=request.POST.get("file_in_binary"))
+    music.save()
     return HttpResponse("inserted")
 
 
@@ -49,10 +100,19 @@ def read_post(request, id):
 
 
 def get_all_music(request):
-    posts = Music.object.all()
-    stringval = ""
-    for post in posts:
-        stringval += "composer" + post.composer + "executor " + post.executor + "genre " + post.genre + "label " + \
-                     post.label + "nominations " + post.nominations + "release_date " + post.genre + "songwriter " + \
-                     post.label + "file_in_binary" + post.file_in_binary + "<br>"
-    return HttpResponse(stringval)
+    musics = Music.object.all()
+    responseData = []
+
+    for music in musics:
+        responseData.append({
+            "composer": music.composer,
+            "executor": music.executor,
+            "genre": music.genre,
+            "label": music.label,
+            "nominations": music.nominations,
+            "release_date": music.release_date,
+            "songwriter": music.songwriter,
+        })
+
+    print(responseData)
+    return JsonResponse(data=responseData, safe=False)
