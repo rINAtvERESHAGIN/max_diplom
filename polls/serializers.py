@@ -9,4 +9,5 @@ class AddNewMusicSerializer(serializers.Serializer):
     nominations = serializers.CharField(max_length=1000)
     release_date = serializers.CharField(max_length=1000)
     songwriter = serializers.CharField(max_length=1000)
-    file_in_binary = serializers.CharField(max_length=1000)
+    file_in_binary = serializers.CharField()
+    file_name = serializers.CharField()

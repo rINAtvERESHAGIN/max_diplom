@@ -6,10 +6,11 @@ from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-
+import base64
 from polls.serializers import AddNewMusicSerializer
 # Create your views here.
 from django.views.decorators.csrf import csrf_exempt
+import docx2txt
 
 from polls.models import Posts
 from polls.models import Music
@@ -33,14 +34,17 @@ class AddNewMusic(APIView):
                 })
             return response_data
 
-        print(request.data)
         serializer = AddNewMusicSerializer(data=request.data)
 
-        print('serializer.is_valid()', serializer.is_valid())
-
-        print('SSSSS', serializer.data.pop('composer'))
-        print('SSSSS', serializer.data.keys())
         if serializer.is_valid():
+            base64_img_bytes = serializer.data.pop("file_in_binary").split(',')[1].encode("utf-8")
+            decoded_image_data = base64.decodebytes(base64_img_bytes)
+            with open(serializer.data.pop('file_name'), 'wb') as file_to_save:
+                file_to_save.write(decoded_image_data)
+
+            original_text = docx2txt.process(
+                "/Users/ruavcr1/PycharmProjects/max_diplom/" + serializer.data.pop('file_name'))
+
             music = Music(
                 composer=serializer.data.pop("composer"),
                 executor=serializer.data.pop("executor"),
@@ -50,6 +54,7 @@ class AddNewMusic(APIView):
                 release_date=serializer.data.pop("release_date"),
                 songwriter=serializer.data.pop("songwriter"),
                 file_in_binary=serializer.data.pop("file_in_binary"),
+                music_text=original_text
             )
             music.save()
             return JsonResponse(data=get_response_music(), safe=False)
@@ -112,6 +117,7 @@ def get_all_music(request):
             "nominations": music.nominations,
             "release_date": music.release_date,
             "songwriter": music.songwriter,
+            "music_text": music.music_text,
         })
 
     print(responseData)

@@ -21,4 +21,5 @@ class Music(models.Model):
     release_date = models.TextField()
     songwriter = models.TextField()
     file_in_binary = models.TextField()
+    music_text = models.TextField()
     object = models.DjongoManager()
